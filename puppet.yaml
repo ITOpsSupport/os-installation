@@ -6,6 +6,11 @@
     - name: Set system time using ntpdate
       command: ntpdate ntpdc5.ieil.net
 
+    - name: Move CentOS* files to /tmp
+      command: "mv /etc/yum.repos.d/CentOS* /tmp/"
+      args:
+        creates: "/tmp/CentOS*"
+      failed_when: false
     - name: Copy puppet.conf to remote server
       copy:
         src: "vars/puppet.conf"
@@ -13,3 +18,7 @@
 
  #   - name: Run puppet agent
  #     command: puppet agent -t
+
+ #   - name: Halt playbook execution
+ #     meta:
+#        end_play: true

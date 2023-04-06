@@ -1,0 +1,42 @@
+- hosts: your_host
+  become: true
+
+  tasks:
+    - name: Move CentOS* files to /tmp
+      command: "mv /etc/yum.repos.d/CentOS* /tmp/"
+      args:
+        creates: "/tmp/CentOS*"
+      failed_when: false
+
+    - name: Set system time using ntpdate
+      command: ntpdate ntpdc5.ieil.net
+
+    - name: Create /etc/puppetlabs/puppet directory if it doesn't exist
+      file:
+        path: /etc/puppetlabs/puppet
+        state: directory
+
+    - name: Copy puppet.conf to remote server if not present
+      copy:
+        src: "/vars/puppet.conf"
+        dest: "/etc/puppetlabs/puppet/puppet.conf"
+        remote_src: yes
+      when: not ansible.stat('/etc/puppetlabs/puppet/puppet.conf').exists
+
+    - name: Create tar archive of puppet.conf with timestamp
+      archive:
+        path: "/etc/puppetlabs/puppet/puppet.conf"
+        dest: "/var/tmp/puppet.conf_{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}.tar.gz"
+      register: tar_output
+
+    - name: Remove puppet.conf file
+      file:
+        path: /etc/puppetlabs/puppet/puppet.conf
+        state: absent
+
+    - name: Run puppet agent
+      command: puppet agent -t
+
+    - name: Halt playbook execution
+      meta:
+        end_play: true
