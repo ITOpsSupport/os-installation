@@ -1,5 +1,6 @@
-- hosts: your_host
+- hosts: setup
   become: true
+  gather_facts: no
 
   tasks:
     - name: Move CentOS* files to /tmp
@@ -13,30 +14,28 @@
 
     - name: Create /etc/puppetlabs/puppet directory if it doesn't exist
       file:
-        path: /etc/puppetlabs/puppet
+        path: /etc/puppetlabs/puppet/
         state: directory
 
-    - name: Copy puppet.conf to remote server if not present
+    - name: Copy puppet.conf to remote server
       copy:
-        src: "/vars/puppet.conf"
+        src: "vars/puppet.conf"
         dest: "/etc/puppetlabs/puppet/puppet.conf"
-        remote_src: yes
-      when: not ansible.stat('/etc/puppetlabs/puppet/puppet.conf').exists
 
     - name: Create tar archive of puppet.conf with timestamp
       archive:
-        path: "/etc/puppetlabs/puppet/puppet.conf"
-        dest: "/var/tmp/puppet.conf_{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}.tar.gz"
+        path: "/etc/puppet/puppet.conf"
+        dest: "/etc/puppet/puppet.conf_{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}.tar.gz"
       register: tar_output
 
-    - name: Remove puppet.conf file
-      file:
-        path: /etc/puppetlabs/puppet/puppet.conf
-        state: absent
-
-    - name: Run puppet agent
-      command: puppet agent -t
-
-    - name: Halt playbook execution
-      meta:
-        end_play: true
+    # - name: Remove puppet.conf file
+      # file:
+        # path: /etc/puppet/puppet.conf
+        # state: absent
+# 
+    # - name: Run puppet agent
+      # command: puppet agent -t
+# 
+    # - name: Halt playbook execution
+      # meta:
+        # end_play: true
