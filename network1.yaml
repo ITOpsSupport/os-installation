@@ -1,0 +1,59 @@
+---
+- name: Copy network configuration files
+  hosts: setup
+  gather_facts: no
+  become: true
+
+  vars_files:
+    - vars/network-scripts.yaml
+
+  tasks:
+    - name: Check if ifcfg-eth0 file is present
+      stat:
+        path: /etc/sysconfig/network-scripts/ifcfg-eth0
+      register: eth0_file_exists
+
+    - name: Check if ifcfg-eth1 file is present
+      stat:
+        path: /etc/sysconfig/network-scripts/ifcfg-eth1
+      register: eth1_file_exists
+
+    - name: Check if ifcfg-bond0 file is present
+      stat:
+        path: /etc/sysconfig/network-scripts/ifcfg-bond0
+      register: bond0_file_exists
+
+    - name: Check if ifcfg-bond1 file is present
+      stat:
+        path: /etc/sysconfig/network-scripts/ifcfg-bond1
+      register: bond1_file_exists
+
+    - name: Copy ifcfg-eth0 file from vars if present
+      when: eth0_file_exists.stat.exists and not bond0_file_exists.stat.exists
+      copy:
+        src: "{{ eth0_file_path }}"
+        dest: /etc/sysconfig/network-scripts/
+
+    - name: Copy ifcfg-eth1 file from vars if present
+      when: eth1_file_exists.stat.exists and not bond1_file_exists.stat.exists
+      copy:
+        src: "{{ eth1_file_path }}"
+        dest: /etc/sysconfig/network-scripts/
+
+    - name: Copy ifcfg-bond0 file from vars if present
+      when: bond0_file_exists.stat.exists
+      copy:
+        src: "{{ bond0_file_path }}"
+        dest: /etc/sysconfig/network-scripts/
+
+    - name: Copy ifcfg-bond1 file from vars if present
+      when: bond1_file_exists.stat.exists
+      copy:
+        src: "{{ bond1_file_path }}"
+        dest: /etc/sysconfig/network-scripts/
+
+    - name: Restart network service
+      service:
+        name: network
+        state: restarted
+
