@@ -1,7 +1,12 @@
 # os-installation
-ansible-playbook -i hosts network1.yaml -u root -k -e ansible_ssh_port=2525
+To run playbook 
+# ansible-playbook -i hosts XXX.yaml -u root -k -e ansible_ssh_port=xxxx
 
-
-
+# network-scripts
+update ifcg-* files carefully
 ## puppet.conf
 capy and paste puppet.conf carefully 
+#  hosts 
+change hosts esvery time 
+[setup]
+XX.XX.XX.XX   # do only one entry at one time 
