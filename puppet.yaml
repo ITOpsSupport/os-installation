@@ -1,0 +1,15 @@
+- hosts: setup
+  become: true
+  gather_facts: no
+
+  tasks:
+    - name: Set system time using ntpdate
+      command: ntpdate ntpdc5.ieil.net
+
+    - name: Copy puppet.conf to remote server
+      copy:
+        src: "vars/puppet.conf"
+        dest: "/etc/puppetlabs/puppet/puppet.conf"
+
+ #   - name: Run puppet agent
+ #     command: puppet agent -t
