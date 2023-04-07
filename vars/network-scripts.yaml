@@ -1,0 +1,6 @@
+---
+eth0_file_path: vars/ifcfg-eth0
+eth1_file_path: vars/ifcfg-eth1
+bond0_file_path: vars/ifcfg-bond0
+bond1_file_path: vars/ifcfg-bond1
+
