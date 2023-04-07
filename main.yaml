@@ -1,0 +1,19 @@
+---
+- hosts: setup
+  gather_facts: false
+  tasks:
+    - include_playbook: network1.yaml
+      ignore_errors: true
+      register: network1_result
+
+    - include_playbook: puppet1.yaml
+      ignore_errors: true
+      register: puppet1_result
+
+    - include_playbook: ad_dnsmasq.yaml
+      ignore_errors: true
+      register: ad_dnsmasq_result
+
+    - fail:
+        msg: "Failed to execute one or more playbooks."
+      when: "network1_result.failed or puppet1_result.failed or ad_dnsmasq_result.failed"
