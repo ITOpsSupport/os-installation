@@ -1,0 +1,19 @@
+- hosts: setup
+  become: true
+  gather_facts: no
+
+  tasks:
+    - name: Check if dnsmasq package is installed
+      shell: rpm -q dnsmasq
+      register: package_check
+      ignore_errors: true
+    
+    - vars_files:
+        - vars/dnsmasq.yaml
+    
+    - name: Remove dnsmasq package
+      yum:
+        name: dnsmasq
+        state: absent
+      when: package_check.stdout != "package dnsmasq is not installed" and user_input | default("no") | lower == "yes"
+    
