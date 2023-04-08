@@ -1,0 +1,16 @@
+---
+- hosts: setup
+  gather_facts: false
+  vars_files:
+    - vars/enter_hostname.yaml
+
+  tasks:
+    - name: Prompt for data center choice
+      vars_prompt:
+        - name: dc_choice
+          prompt: "Which data center do you want to run? (DC4/DC5)"
+          private: no
+
+    - name: Run directory structure playbook for selected data center
+      include_tasks: "directory_structure_{{ dc_choice }}.yml"
+      when: dc_choice in ["DC4", "DC5"]

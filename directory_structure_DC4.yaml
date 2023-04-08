@@ -1,0 +1,41 @@
+---
+- name: Directory structure playbook for DC4
+  hosts: setup
+  become: true
+
+  tasks:
+    - name: Log in to server
+      ansible.builtin.shell: "ssh user@10.10.84.26 -p 3535"
+      become_user: root
+
+    - name: Check if file is present
+      ansible.builtin.file:
+        path: "/apps/puppetmaster/code/environments/production/modules/filemanager/files/nginx/{{ desired_hostname }}"
+      register: nginx_file
+      failed_when: false
+
+    - name: Check if file is present
+      ansible.builtin.file:
+        path: "/apps/puppetmaster/code/environments/production/modules/filemanager/files/apache/{{ desired_hostname }}"
+      register: apache_file
+      failed_when: false
+
+    - name: Check if file is present
+      ansible.builtin.file:
+        path: "/apps/puppetmaster/code/environments/production/modules/filemanager/files/pbis/{{ desired_hostname }}"
+      register: pbis_file
+      failed_when: false
+
+    - name: Exit if file is present
+      ansible.builtin.fail:
+        msg: "File already exists, exiting."
+      when: nginx_file.stat.exists or apache_file.stat.exists or pbis_file.stat.exists
+
+    - name: Run create_puppet_dirs.sh with expect
+      ansible.builtin.expect:
+        command: "/apps/puppetmaster/code/environments/production/create_puppet_dirs.sh"
+        responses:
+          Enter\ username\ :\: "{{ username }}\n"
+          Enter\ hostname\ :\: "{{ desired_hostname }}\n"
+      args:
+        chdir: "/apps/puppetmaster/code/environments/production"
