@@ -1,8 +1,7 @@
 ---
-- hosts: setup
+- name: Play to prompt user for data center choice and include directory structure file
+  hosts: setup
   gather_facts: false
-  vars_files:
-    - vars/enter_hostname.yaml
 
   tasks:
     - name: Prompt for data center choice
@@ -11,6 +10,7 @@
           prompt: "Which data center do you want to run? (DC4/DC5)"
           private: no
 
-    - name: Run directory structure playbook for selected data center
-      include_tasks: "directory_structure_{{ dc_choice }}.yml"
+    - name: Include directory structure file based on user's choice
+      include_vars:
+        file: "vars/directory_structure_{{ dc_choice }}.yaml"
       when: dc_choice in ["DC4", "DC5"]
