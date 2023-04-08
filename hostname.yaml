@@ -1,0 +1,22 @@
+---
+- name: Check and set hostname
+  hosts: setup
+  become: true
+  vars_files:
+    - vars/enter_hostname.yaml
+
+  tasks:
+    - name: Get current hostname
+      shell: hostname
+      register: current_hostname
+
+    - name: Check if current hostname matches desired hostname
+      fail:
+        msg: "Hostname does not match desired hostname"
+      when: current_hostname.stdout != "{{ desired_hostname }}"
+
+    - name: Set desired hostname
+      hostname:
+        name: "{{ desired_hostname }}"
+      when: current_hostname.stdout != "{{ desired_hostname }}"
+
