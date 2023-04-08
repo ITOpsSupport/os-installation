@@ -1,19 +1,27 @@
 ---
-- hosts: setup
-  gather_facts: false
+- name: Run multiple playbooks from os-installation repository
+  hosts: setup
+  become: true
+
   tasks:
-    - include_playbook: network1.yaml
-      ignore_errors: true
-      register: network1_result
+    - name: Clone os-installation repository
+      git:
+        repo: https://github.com/ITOpsSupport/os-installation.git
+        dest: /opt/os-installation
+        version: main
 
-    - include_playbook: puppet1.yaml
-      ignore_errors: true
-      register: puppet1_result
+    - name: Run hostname.yaml playbook
+      ansible-playbook:
+        playbook: /opt/os-installation/hostname.yaml
 
-    - include_playbook: ad_dnsmasq.yaml
-      ignore_errors: true
-      register: ad_dnsmasq_result
+    - name: Run network1.yaml playbook
+      ansible-playbook:
+        playbook: /opt/os-installation/network1.yaml
 
-    - fail:
-        msg: "Failed to execute one or more playbooks."
-      when: "network1_result.failed or puppet1_result.failed or ad_dnsmasq_result.failed"
+    - name: Run puppet1.yaml playbook
+      ansible-playbook:
+        playbook: /opt/os-installation/puppet1.yaml
+
+    - name: Run ad_dnsmasq.yaml playbook
+      ansible-playbook:
+        playbook: /opt/os-installation/ad_dnsmasq.yaml
