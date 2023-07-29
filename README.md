@@ -5,7 +5,7 @@ To run playbook
 # network-scripts
 update ifcg-* files carefully
 ## puppet.conf
-capy and paste puppet.conf carefully 
+copy and paste puppet.conf carefully 
 #  hosts 
 change hosts esvery time 
 [setup]
